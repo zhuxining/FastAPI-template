@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from app.core.config import settings
 from app.models.user import Base
 
-engine = create_async_engine(str(settings.POSTGRES_URI), echo=False, future=True)
+engine = create_async_engine(str(settings.SQLITE_URL), echo=False, future=True)
 async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
