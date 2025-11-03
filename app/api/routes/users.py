@@ -10,10 +10,10 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 # User management routes
 router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
+	fastapi_users.get_users_router(UserRead, UserUpdate),
 )
 
 
 @router.get("/me")
 async def authenticated_route(user: Annotated[User, Depends(current_active_user)]):
-    return {"message": f"Hello {user.email}!", "user": user}
+	return {"message": f"Hello {user.email}!", "user": user}

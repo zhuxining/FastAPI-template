@@ -3,51 +3,42 @@ name = "FastAPI-Template"
 version = "0.1.0"
 description = "Modern FastAPI backend with best practices"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
-    "fastapi[standard]>=0.115.6",
-    "granian>=1.7.3",
-    "pydantic>=2.10.4",
-    "pydantic-settings>=2.7.0",
-    "sqlmodel>=0.0.22 ",
+    "fastapi[standard]>=0.121.0",
+    "granian[dotenv,pname,uvloop]>=2.5.6",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "sqlmodel>=0.0.27",
     "loguru>=0.7.3",
-    "fastapi-users[oauth,sqlalchemy]>=14.0.0",
-    "pwdlib>=0.2.1",
+    "fastapi-users[oauth,sqlalchemy]>=15.0.1",
     "asyncpg>=0.30.0",
 ]
 
-[tool.uv]
-index-url = "https://pypi.org/simple"
-dev-dependencies = [
-    "pytest-asyncio>=0.25",
-    "pytest>=8.3.4",
-    "httpx>=0.28.1",
-    "mypy>=1.14.0",
-    "ruff>=0.8.4",
-    "alembic>=1.14.0",
-    "aiosqlite>=0.20.0",
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.2.0",
+    "pytest>=8.4.2",
+    "ruff>=0.14.3",
+    "alembic>=1.17.1",
+    "aiosqlite>=0.21.0",
 ]
 
 
 [tool.ruff]
-target-version = "py313"
 exclude = ["alembic"]
 line-length = 100
-indent-width = 4
+preview = true
 fix = true
+unsafe-fixes = true
 
 [tool.ruff.lint]
-select = ["F", "E", "N", "I", "FAST"]
+future-annotations = true
+select = ["F", "E", "UP", "B", "SIM", "I"]
 
 [tool.ruff.format]
 quote-style = "double"
-indent-style = "space"
-
-[tool.mypy]
-python_version = "3.13"
-strict = true
-exclude = ["venv", ".venv", "alembic"]
-plugins = ["pydantic.mypy"]
+indent-style = "tab"
 
 [tool.uv.workspace]
 members = ["git"]
