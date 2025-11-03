@@ -2,7 +2,7 @@
 
 这是一个使用 FastAPI 最佳实践构建的纯后端项目，参考官方实践。
 
-### 构建工具
+### 技术栈
 
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Pydantic](https://pydantic-docs.helpmanual.io/)
@@ -14,27 +14,20 @@
 
 ## 入门指南
 
+**依赖安装：**
 
-### 安装
-
-1. 克隆仓库
-    ```sh
-    git clone https://github.com/your_username/ylsh-backend.git
-    ```
-2. 进入项目目录
-    ```sh
-    cd ylsh-backend
-    ```
-3. 安装依赖
-    ```sh
-    uv sync
-    ```
-
-## 使用方法
-
-启动项目：
 ```sh
-granian --interface rsgi app.main:app --reload --log --access-log
+uv sync
+```
+
+**启动项目：**
+```sh
+uv run serve.py
+```
+
+**Lint and Formatter：**
+```sh
+uv run ruff check --fix
 ```
 
 ## 路线图
@@ -62,8 +55,3 @@ granian --interface rsgi app.main:app --reload --log --access-log
     - [ ] 使用的一些注意事项
 
 
-## 许可证
-
-该项目使用 MIT 许可证。详情请参阅 [LICENSE](LICENSE)。
-
-## 感谢

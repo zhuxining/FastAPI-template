@@ -1,12 +1,18 @@
+# MacOS
+.DS_Store
+
+# Python
 __pycache__
 .cache
 .pytest_cache
 .ruff_cache
 .ropeproject
 
+# Env
 .venv
 .env
 
+# Dev
+local.db*
 logs
-.DS_Store
 

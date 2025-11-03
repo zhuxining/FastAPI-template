@@ -16,47 +16,47 @@ from app.core.db import create_db_and_tables
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Not needed if you setup a migration system like Alembic
-    logger.add(
-        "logs/app_{time:YYYY-MM-DD}.log",
-        level="SUCCESS",
-        rotation="1 day",
-        retention="7 days",
-        enqueue=True,
-    )
-    logger.success("FastAPI app started")
-    await create_db_and_tables()
-    await create_user(settings.FIRST_SUPERUSER_EMAIL, settings.FIRST_SUPERUSER_PASSWORD)
-    yield
+	# Not needed if you setup a migration system like Alembic
+	logger.add(
+		"logs/app_{time:YYYY-MM-DD}.log",
+		level="SUCCESS",
+		rotation="1 day",
+		retention="7 days",
+		enqueue=True,
+	)
+	logger.success("FastAPI app started")
+	await create_db_and_tables()
+	await create_user(settings.FIRST_SUPERUSER_EMAIL, settings.FIRST_SUPERUSER_PASSWORD)
+	yield
 
 
 def custom_generate_unique_id(route: APIRoute):
-    return f"{route.tags[0]}-{route.name}"
+	return f"{route.tags[0]}-{route.name}"
 
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    description=settings.DESCRIPTION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    version=settings.VERSION,
-    lifespan=lifespan,
-    generate_unique_id_function=custom_generate_unique_id,
-    debug=(settings.ENVIRONMENT == "dev"),
+	title=settings.PROJECT_NAME,
+	description=settings.DESCRIPTION,
+	openapi_url=f"{settings.API_V1_STR}/openapi.json",
+	version=settings.VERSION,
+	lifespan=lifespan,
+	generate_unique_id_function=custom_generate_unique_id,
+	debug=(settings.ENVIRONMENT == "dev"),
 )
 
 # CORS middleware
 if settings.all_cors_origins:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+	app.add_middleware(
+		CORSMiddleware,
+		allow_origins=settings.all_cors_origins,
+		allow_credentials=True,
+		allow_methods=["*"],
+		allow_headers=["*"],
+	)
 
 if settings.ENVIRONMENT == "prod":
-    app.add_middleware(HTTPSRedirectMiddleware)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
+	app.add_middleware(HTTPSRedirectMiddleware)
+	app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
 
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 
