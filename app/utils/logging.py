@@ -104,3 +104,10 @@ def setup_logging(settings, *, force: bool = False):
 		existing_logger.propagate = False
 
 	_LOGGING_INITIALIZED = True
+
+
+def get_request_id() -> str | None:
+	request_id = request_id_ctx_var.get()
+	if request_id == "-":
+		return None
+	return request_id

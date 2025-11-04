@@ -12,6 +12,7 @@ from app.api.api import api_router
 from app.api.deps import create_user
 from app.core.config import settings
 from app.core.db import create_db_and_tables
+from app.utils.exceptions import register_exception_handlers
 from app.utils.logging import RequestLoggingMiddleware, setup_logging
 
 
@@ -41,6 +42,7 @@ app = FastAPI(
 	generate_unique_id_function=custom_generate_unique_id,
 	debug=(settings.ENVIRONMENT == "dev"),
 )
+register_exception_handlers(app)
 
 # CORS middleware
 if settings.all_cors_origins:
