@@ -100,8 +100,8 @@ async def create_user(email: str, password: str, is_superuser: bool = False):
 			user = await user_manager.create(
 				UserCreate(email=email, password=password, is_superuser=is_superuser)
 			)
-			logger.info(f"User created {user}")
+			logger.success(f"User created {user}")
 			return user
 	except UserAlreadyExists:
-		logger.info(f"User {email} already exists")
+		logger.warning(f"User {email} already exists")
 		pass

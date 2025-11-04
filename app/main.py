@@ -12,22 +12,20 @@ from app.api.api import api_router
 from app.api.deps import create_user
 from app.core.config import settings
 from app.core.db import create_db_and_tables
+from app.utils.logging import RequestLoggingMiddleware, setup_logging
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-	# Not needed if you setup a migration system like Alembic
-	logger.add(
-		"logs/app_{time:YYYY-MM-DD}.log",
-		level="SUCCESS",
-		rotation="1 day",
-		retention="7 days",
-		enqueue=True,
-	)
-	logger.success("FastAPI app started")
+	setup_logging(settings)
+	logger.info("FastAPI app startup")
 	await create_db_and_tables()
 	await create_user(settings.FIRST_SUPERUSER_EMAIL, settings.FIRST_SUPERUSER_PASSWORD)
-	yield
+	logger.success("Startup initialization complete")
+	try:
+		yield
+	finally:
+		logger.info("FastAPI app shutdown")
 
 
 def custom_generate_unique_id(route: APIRoute):
@@ -58,6 +56,7 @@ if settings.ENVIRONMENT == "prod":
 	app.add_middleware(HTTPSRedirectMiddleware)
 	app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
 
+app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 
 # Include API router

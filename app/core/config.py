@@ -49,6 +49,9 @@ class Settings(BaseSettings):
 	# Allowed Hosts
 	TRUSTED_HOSTS: Annotated[list | str, BeforeValidator(parse_cors)] = []
 
+	# Logging
+	LOG_LEVEL: str = "INFO"
+
 	# Database Settings
 	SQLITE_URL: str = "sqlite+aiosqlite:///./local.db"
 
