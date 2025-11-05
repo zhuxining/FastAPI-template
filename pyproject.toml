@@ -5,8 +5,8 @@ description = "Modern FastAPI backend with best practices"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi[standard]>=0.121.0",
-    "granian[dotenv,pname,uvloop]>=2.5.6",
+    "fastapi>=0.121.0",
+    "granian[dotenv,pname,uvloop,reload]>=2.5.6",
     "pydantic>=2.12.3",
     "pydantic-settings>=2.11.0",
     "sqlmodel>=0.0.27",
@@ -23,7 +23,6 @@ dev = [
     "alembic>=1.17.1",
     "aiosqlite>=0.21.0",
 ]
-
 
 [tool.ruff]
 exclude = ["alembic"]
