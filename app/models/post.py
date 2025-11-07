@@ -14,7 +14,7 @@ class PostBase(SQLModel):
 
 # database model
 class Post(BaseModel, PostBase, table=True):
-	__tablename__: ClassVar[str] = "posts"
+	__tablename__: ClassVar[str] = "post"
 	__table_args__ = dict(comment="Posts table")
 
 	author_id: uuid.UUID = Field(
