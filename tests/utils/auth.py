@@ -10,7 +10,8 @@ async def get_auth_headers(client: AsyncClient, *, email: str, password: str) ->
 	)
 	if response.status_code != 200:
 		raise AssertionError(
-			f"Failed to obtain auth token for {email}: status={response.status_code} body={response.text}"
+			f"Failed to obtain auth token for {email}: "
+			f"status={response.status_code} body={response.text}"
 		)
 	data = response.json()
 	token = data["access_token"]

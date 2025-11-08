@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-import pytest
-from httpx import AsyncClient
+import asyncio
+
+from fastapi.testclient import TestClient
 from sqlmodel import select
 
 from app.core.config import settings
 from app.models import Post
-from tests.utils.factories import CreatedUser
+from tests.utils.user_deps import CreatedUser
 
 
-@pytest.mark.asyncio()
-async def test_create_post_success(
-	client: AsyncClient,
+def test_create_post_success(
+	client: TestClient,
 	session_maker,
 	test_user: CreatedUser,
 ):
 	payload = {"title": "测试 Post", "content": "测试内容", "is_published": True}
 
-	response = await client.post(f"{settings.API_V1_STR}/post/", json=payload)
+	response = client.post(f"{settings.API_V1_STR}/post/", json=payload)
 
 	assert response.status_code == 200
 	body = response.json()
@@ -25,11 +25,14 @@ async def test_create_post_success(
 	assert body["message"] == "创建成功"
 	assert body["data"]["title"] == payload["title"]
 
-	async with session_maker() as session:
-		result = await session.execute(select(Post))
-		posts = result.scalars().all()
+	async def _fetch_posts():
+		async with session_maker() as session:
+			result = await session.execute(select(Post))
+			posts = result.scalars().all()
+			return posts
 
-		assert len(posts) == 1
-		saved_post = posts[0]
-		assert saved_post.title == payload["title"]
-		assert saved_post.author_id == test_user.id
+	posts = asyncio.run(_fetch_posts())
+	assert len(posts) == 1
+	saved_post = posts[0]
+	assert saved_post.title == payload["title"]
+	assert saved_post.author_id == test_user.id

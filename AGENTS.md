@@ -11,7 +11,7 @@
 | `app/api/`    | HTTP 对外接口            | `api.py` 汇总路由；`deps.py` 存放依赖；`routes/` 中按照功能划分子路由                 |
 | `app/models/` | 领域与持久化模型         | `base_model.py` 定义 ORM 基类；`user.py`、`post.py` 等提供具体实体                                |
 | `app/utils/`  | 跨层工具                 | 提供可在多个模块复用的通用工具方法|
-| `app/tests/`  | 测试                     |                                                                        |
+| `tests/`      | 测试                     | `conftest.py` 提供统一的异步 SQLite 测试环境、用户工厂和 `TestClient` 依赖覆盖；`tests/utils/` 存放测试专用工具 |
 | `serve.py`    | 本地运行入口             | 通过 `uv` 启动应用的便捷脚本                                                                    |
 | `logs/`       | 运行日志                 | 应用写入的日志文件                                                                           |
 
@@ -19,6 +19,7 @@
 
 - `uv run serve.py` —— 启动服务
 - `uv run ruff check --fix` —— 使用 Ruff 进行格式化与静态检查
+- `uv run pytest` —— 运行测试
 
 ## 数据库与 Pydantic 校验模型
 
@@ -34,6 +35,16 @@
 - 共享依赖（数据库会话、鉴权上下文等）集中在 `app/core/deps.py`，通过依赖注入传入路由处理函数。
 - 路由处理函数调用 `app/models/*` 进行 ORM 交互，并在需要时复用 `app/utils/` 中的工具。
 - 响应沿路由返回，由 `app/main.py` 中的中间件与异常处理器完成最终输出。
+- 标准响应通过 `app/utils/responses.py` 中的 `ResponseEnvelope/success_response/error_response` 构建，所有 API 都应返回统一 envelope。
+- 业务异常需继承 `app/utils/exceptions.py` 的基类（如 `AppException/NotFoundException/ForbiddenException`），并在 `register_exception_handlers` 中自动转换为标准响应。
+- 日志相关逻辑封装在 `app/utils/logging.py`，`setup_logging` 统一初始化 Loguru，`RequestLoggingMiddleware` 负责记录请求耗时；如需自定义日志，请复用现有 logger 配置。
+
+## 测试规范与执行
+
+- 测试结构遵循 `tests/<模块>/...`，其中 `tests/api/routes/` 用于 API 行为测试、`tests/utils/` 保存测试依赖（如 `user_deps.py`、`auth.py` 等）。
+- `tests/conftest.py` 创建临时 SQLite 数据库，并通过 `UserFactory` 生成受控的激活用户；所有需要登录的用例应复用 `test_user` fixture，不得手动插入散乱数据。
+- 需要授权的测试通过 `tests/utils/auth.py` 的 `get_auth_headers` 函数，从真实登录接口获取 JWT，确保鉴权链路与生产一致。
+- 如需自定义测试数据，请优先扩展工厂或局部 fixture，避免在测试中直接依赖生产环境状态。
 
 ## 更新建议
 
