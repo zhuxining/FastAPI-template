@@ -1,14 +1,13 @@
 from typing import Any, TypeVar
 
-from pydantic import Field
-from pydantic.generics import GenericModel
+from pydantic import BaseModel, Field
 
 from app.utils.logging import get_request_id
 
 DataT = TypeVar("DataT")
 
 
-class ResponseEnvelope[DataT](GenericModel):
+class ResponseEnvelope[DataT](BaseModel):
 	success: bool = Field(description="请求是否成功")
 	data: DataT | None = Field(default=None, description="响应数据")
 	error_code: str | None = Field(default=None, description="错误类型编码，用于业务识别")

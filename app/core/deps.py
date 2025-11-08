@@ -89,6 +89,8 @@ get_async_session_context = contextlib.asynccontextmanager(get_db)
 get_user_db_context = contextlib.asynccontextmanager(get_user_db)
 get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 
+CurrentUserDep = Annotated[User, Depends(current_active_user)]
+
 
 async def create_user(email: str, password: str, is_superuser: bool = False):
 	try:

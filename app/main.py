@@ -8,10 +8,10 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.routing import APIRoute
 from loguru import logger
 
-from app.api.api import api_router
-from app.api.deps import create_user
+from app.api import api_router
 from app.core.config import settings
 from app.core.db import create_db_and_tables
+from app.core.deps import create_user
 from app.utils.exceptions import register_exception_handlers
 from app.utils.logging import RequestLoggingMiddleware, setup_logging
 
@@ -33,10 +33,13 @@ def custom_generate_unique_id(route: APIRoute):
 	return f"{route.tags[0]}-{route.name}"
 
 
+is_prod = settings.ENVIRONMENT == "prod"
 app = FastAPI(
 	title=settings.PROJECT_NAME,
 	description=settings.DESCRIPTION,
-	openapi_url=f"{settings.API_V1_STR}/openapi.json",
+	openapi_url=None if is_prod else f"{settings.API_V1_STR}/openapi.json",
+	docs_url=None if is_prod else "/docs",
+	redoc_url=None if is_prod else "/redoc",
 	version=settings.VERSION,
 	lifespan=lifespan,
 	generate_unique_id_function=custom_generate_unique_id,
@@ -54,7 +57,7 @@ if settings.all_cors_origins:
 		allow_headers=["*"],
 	)
 
-if settings.ENVIRONMENT == "prod":
+if is_prod:
 	app.add_middleware(HTTPSRedirectMiddleware)
 	app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
 
