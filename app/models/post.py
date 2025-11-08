@@ -1,5 +1,5 @@
 import uuid
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from sqlmodel import Field, SQLModel
 
@@ -14,8 +14,8 @@ class PostBase(SQLModel):
 
 # database model
 class Post(BaseModel, PostBase, table=True):
-	__tablename__: ClassVar[str] = "post"
-	__table_args__ = dict(comment="Posts table")
+	__tablename__: ClassVar[Any] = "post"
+	__table_args__ = {"comment": "Posts table"}
 
 	author_id: uuid.UUID = Field(
 		default_factory=uuid.uuid7, sa_column_kwargs={"comment": "作者ID, UUID v7"}
