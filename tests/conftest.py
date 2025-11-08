@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import uuid
-from types import SimpleNamespace
-
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -10,14 +8,19 @@ from sqlmodel import SQLModel
 
 from app.core import deps
 from app.main import app
+from app.models.user import Base as UserBase
+from tests.utils.factories import CreatedUser, PostFactory, UserFactory
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def session_maker(tmp_path):
-	db_file = tmp_path / "test_post.db"
+async def session_maker(tmp_path_factory):
+	tmp_dir = tmp_path_factory.mktemp("db")
+	db_file = tmp_dir / "test_post.db"
 	engine = create_async_engine(f"sqlite+aiosqlite:///{db_file.as_posix()}", future=True)
 	async with engine.begin() as conn:
+		await conn.run_sync(UserBase.metadata.drop_all)
 		await conn.run_sync(SQLModel.metadata.drop_all)
+		await conn.run_sync(UserBase.metadata.create_all)
 		await conn.run_sync(SQLModel.metadata.create_all)
 
 	session_factory = async_sessionmaker(engine, expire_on_commit=False)
@@ -28,19 +31,38 @@ async def session_maker(tmp_path):
 		await engine.dispose()
 
 
-@pytest_asyncio.fixture()
-async def test_user() -> SimpleNamespace:
-	return SimpleNamespace(id=uuid.uuid7(), is_active=True, is_superuser=False)
+@pytest.fixture(scope="session")
+def user_factory(session_maker) -> UserFactory:
+	return UserFactory(session_maker)
+
+
+@pytest.fixture(scope="session")
+def post_factory(session_maker, user_factory: UserFactory) -> PostFactory:
+	return PostFactory(session_maker, user_factory)
 
 
 @pytest_asyncio.fixture()
-async def client(session_maker, test_user):
+async def db_session(session_maker):
+	async with session_maker() as session:
+		try:
+			yield session
+		finally:
+			await session.rollback()
+
+
+@pytest_asyncio.fixture()
+async def test_user(user_factory: UserFactory) -> CreatedUser:
+	return await user_factory.create_active()
+
+
+@pytest_asyncio.fixture()
+async def client(session_maker, test_user: CreatedUser):
 	async def _override_get_db():
 		async with session_maker() as session:
 			yield session
 
 	async def _override_current_user():
-		return test_user
+		return test_user.instance
 
 	app.dependency_overrides[deps.get_db] = _override_get_db
 	app.dependency_overrides[deps.current_active_user] = _override_current_user
