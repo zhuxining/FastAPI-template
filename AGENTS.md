@@ -4,16 +4,16 @@
 
 ## 模块概览
 
-| 路径          | 角色说明                 | 关键备注                                        |
-| ------------- | ------------------------ | ----------------------------------------------- |
-| `app/main.py` | FastAPI 入口             | 创建应用实例并挂载所有路由。                                                                       |
-| `app/core/`   | 配置与基础设施           | 统一管理配置(`config.py`)、数据库(`db.py`)以及共享依赖（数据库会话、鉴权上下文等）               |
-| `app/api/`    | HTTP 对外接口            | `api.py` 汇总路由；`deps.py` 存放依赖；`routes/` 中按照功能划分子路由                 |
-| `app/models/` | 领域与持久化模型         | `base_model.py` 定义 ORM 基类；`user.py`、`post.py` 等提供具体实体                                |
-| `app/utils/`  | 跨层工具                 | 提供可在多个模块复用的通用工具方法|
-| `tests/`      | 测试                     | `conftest.py` 提供统一的异步 SQLite 测试环境、用户工厂和 `TestClient` 依赖覆盖；`tests/utils/` 存放测试专用工具 |
-| `serve.py`    | 本地运行入口             | 通过 `uv` 启动应用的便捷脚本                                                                    |
-| `logs/`       | 运行日志                 | 应用写入的日志文件                                                                           |
+| 路径          | 角色说明         | 关键备注                                                                                                        |
+| ------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| `app/main.py` | FastAPI 入口     | 创建应用实例并挂载所有路由。                                                                                    |
+| `app/core/`   | 配置与基础设施   | 统一管理配置(`config.py`)、数据库(`db.py`)以及共享依赖（数据库会话、鉴权上下文等）                              |
+| `app/api/`    | HTTP 对外接口    | `api.py` 汇总路由；`deps.py` 存放依赖；`routes/` 中按照功能划分子路由                                           |
+| `app/models/` | 领域与持久化模型 | `base_model.py` 定义 ORM 基类；`user.py`、`post.py` 等提供具体实体                                              |
+| `app/utils/`  | 跨层工具         | 提供可在多个模块复用的通用工具方法                                                                              |
+| `tests/`      | 测试             | `conftest.py` 提供统一的异步 SQLite 测试环境、用户工厂和 `TestClient` 依赖覆盖；`tests/utils/` 存放测试专用工具 |
+| `serve.py`    | 本地运行入口     | 通过 `uv` 启动应用的便捷脚本                                                                                    |
+| `logs/`       | 运行日志         | 应用写入的日志文件                                                                                              |
 
 ## 开发常用命令
 
@@ -26,7 +26,7 @@
 - 模型拆分成三层：公共字段(`*Base`)，数据库实体(`table=True`)，以及 Pydantic 校验模型（`Create/Update/Read`）。保持字段来源清晰，避免重复定义。
 - `app/models/base_model.py` 提供统一的主键和审计列，新的数据库模型必须继承它，并复用其中的列约定。
 - 单文件仅维护一个实体，文件名使用实体名（如 `post.py`），数据库表名(`__tablename__`)一律使用该实体的单数形式。
-- Pydantic 模型基于 SQLModel/Pydantic v2 写法，`Create/Update` 仅暴露可写字段，`Read` 通过继承 `BaseModel` 追加只读字段和 ID，必要时配置 `model_config = ConfigDict(from_attributes=True)`。
+- Pydantic 模型基于 SQLModel/Pydantic v2 写法，`Create/Update` 仅暴露可写字段，`Read` 通过继承 `BaseModel` 追加只读字段和 ID，不需要配置 `model_config = ConfigDict(from_attributes=True)`。
 - 参考 `app/models/post.py` 的层次结构、注释与 `Field` 配置，新增模型时保持同样的注释、类型提示和 `sa_column_kwargs` 说明，以便数据库与文档同步。
 
 ## 请求流程说明

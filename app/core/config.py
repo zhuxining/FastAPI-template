@@ -38,11 +38,11 @@ class Settings(BaseSettings):
 	# Database Settings
 	DATABASE_TYPE: Literal["postgresql", "sqlite"] = "sqlite"
 	SQLITE_URL: str = "sqlite+aiosqlite:///./local.db"
-	POSTGRES_SERVER: str = "localhost"
+	POSTGRES_SERVER: str = ""
 	POSTGRES_PORT: int = 5432
-	POSTGRES_DB: str = "app"
-	POSTGRES_USER: str = "postgres"
-	POSTGRES_PASSWORD: str = "postgres"
+	POSTGRES_DB: str = ""
+	POSTGRES_USER: str = ""
+	POSTGRES_PASSWORD: str = ""
 
 	# Security Settings
 	BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []  # CORS

@@ -36,16 +36,16 @@ uv run pytest
 
 ## 📂 目录速览
 
-| 路径 | 说明 |
-| --- | --- |
-| `app/main.py` | FastAPI 入口，挂载路由、中间件、异常处理。|
-| `app/core/` | 配置、数据库会话、FastAPI Users 依赖。|
-| `app/api/` | 业务路由（auth/user/post）。|
-| `app/models/` | SQLModel & Pydantic 模型。|
-| `app/utils/` | 响应包装、异常、日志等跨层工具。|
-| `tests/` | pytest 用例、fixture、辅助函数。|
-| `serve.py` | 本地运行脚本，封装 `uvicorn`/`granian` 启动逻辑。|
-| `Dockerfile` | 生产镜像构建配置。|
+| 路径          | 说明                                              |
+| ------------- | ------------------------------------------------- |
+| `app/main.py` | FastAPI 入口，挂载路由、中间件、异常处理。        |
+| `app/core/`   | 配置、数据库会话、FastAPI Users 依赖。            |
+| `app/api/`    | 业务路由（auth/user/post）。                      |
+| `app/models/` | SQLModel & Pydantic 模型。                        |
+| `app/utils/`  | 响应包装、异常、日志等跨层工具。                  |
+| `tests/`      | pytest 用例、fixture、辅助函数。                  |
+| `serve.py`    | 本地运行脚本，封装 `uvicorn`/`granian` 启动逻辑。 |
+| `Dockerfile`  | 生产镜像构建配置。                                |
 
 更多协作规范（如测试约定、目录约束）请参考 [AGENTS.md](AGENTS.md)。
 
