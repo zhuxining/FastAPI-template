@@ -33,13 +33,12 @@ def custom_generate_unique_id(route: APIRoute):
 	return f"{route.tags[0]}-{route.name}"
 
 
-is_prod = settings.ENVIRONMENT == "prod"
 app = FastAPI(
 	title=settings.PROJECT_NAME,
 	description=settings.DESCRIPTION,
-	openapi_url=None if is_prod else f"{settings.API_V1_STR}/openapi.json",
-	docs_url=None if is_prod else "/docs",
-	redoc_url=None if is_prod else "/redoc",
+	openapi_url=f"{settings.API_V1_STR}/openapi.json" if settings.SWAGGER_UI_ENABLED else None,
+	docs_url="/docs" if settings.SWAGGER_UI_ENABLED else None,
+	redoc_url="/redoc" if settings.SWAGGER_UI_ENABLED else None,
 	version=settings.VERSION,
 	lifespan=lifespan,
 	generate_unique_id_function=custom_generate_unique_id,
@@ -57,7 +56,7 @@ if settings.all_cors_origins:
 		allow_headers=["*"],
 	)
 
-if is_prod:
+if settings.ENVIRONMENT == "prod":
 	app.add_middleware(HTTPSRedirectMiddleware)
 	app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
 

@@ -4,7 +4,9 @@ from sqlmodel import SQLModel
 from app.core.config import settings
 from app.models.user import Base
 
-database_url = settings.SQLITE_URL if settings.ENVIRONMENT == "dev" else settings.postgre_url
+database_url = (
+	settings.postgre_url if settings.DATABASE_TYPE == "postgresql" else settings.SQLITE_URL
+)
 
 engine = create_async_engine(str(database_url), echo=False, future=True)
 async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

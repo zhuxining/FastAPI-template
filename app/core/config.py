@@ -30,36 +30,40 @@ class Settings(BaseSettings):
 		extra="allow",  # Allow extra fields from env file
 	)
 
+	# General Settings
 	ENVIRONMENT: Literal["dev", "test", "prod"] = "dev"
-
-	# API Settings
-	API_V1_STR: str = "/api/v1"
-	PROJECT_NAME: str = pyproject.get("project", {}).get("name")
-	VERSION: str = pyproject.get("project", {}).get("version")
-	DESCRIPTION: str = pyproject.get("project", {}).get("description")
-
-	# CORS Settings
-	BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
-
-	@computed_field
-	@property
-	def all_cors_origins(self) -> list[str]:
-		return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
-
-	# Allowed Hosts
-	TRUSTED_HOSTS: Annotated[list | str, BeforeValidator(parse_cors)] = []
-
-	# Logging
-	LOG_LEVEL: str = "INFO"
+	LOG_LEVEL: str = "INFO"  # Logging level
+	SWAGGER_UI_ENABLED: bool = True  # Swagger UI, Change in production
 
 	# Database Settings
+	DATABASE_TYPE: Literal["postgresql", "sqlite"] = "sqlite"
 	SQLITE_URL: str = "sqlite+aiosqlite:///./local.db"
-
 	POSTGRES_SERVER: str = "localhost"
 	POSTGRES_PORT: int = 5432
 	POSTGRES_DB: str = "app"
 	POSTGRES_USER: str = "postgres"
 	POSTGRES_PASSWORD: str = "postgres"
+
+	# Security Settings
+	BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []  # CORS
+	TRUSTED_HOSTS: Annotated[list | str, BeforeValidator(parse_cors)] = []  # Allowed Hosts
+
+	SECRET_KEY: str = "YOUR-SECRET-KEY-123"  # JWT Settings, Change in production
+	ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
+
+	FIRST_SUPERUSER_EMAIL: str = "admin@admin.com"  # First Superuser
+	FIRST_SUPERUSER_PASSWORD: str = "admin@admin.com"
+
+	# OpenAPI Docs Settings, loaded from pyproject.toml
+	API_V1_STR: str = "/api/v1"
+	PROJECT_NAME: str = pyproject.get("project", {}).get("name")
+	VERSION: str = pyproject.get("project", {}).get("version")
+	DESCRIPTION: str = pyproject.get("project", {}).get("description")
+
+	@computed_field
+	@property
+	def all_cors_origins(self) -> list[str]:
+		return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
 
 	@computed_field
 	@property
@@ -73,14 +77,6 @@ class Settings(BaseSettings):
 			path=self.POSTGRES_DB,
 		)
 		return cast(PostgresDsn, str(url))
-
-	# JWT Settings
-	SECRET_KEY: str = "YOUR-SECRET-KEY-123"  # Change in production
-	ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
-
-	# First Superuser
-	FIRST_SUPERUSER_EMAIL: str = "admin@admin.com"
-	FIRST_SUPERUSER_PASSWORD: str = "admin@admin.com"
 
 
 settings = Settings()
