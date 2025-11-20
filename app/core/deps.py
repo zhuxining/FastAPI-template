@@ -1,7 +1,7 @@
 import contextlib
-import uuid
 from collections.abc import AsyncGenerator
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
@@ -20,7 +20,7 @@ from app.core.db import async_session_maker
 from app.models import User, UserCreate
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+class UserManager(UUIDIDMixin, BaseUserManager[User, UUID]):
 	reset_password_token_secret = settings.SECRET_KEY
 	verification_token_secret = settings.SECRET_KEY
 
@@ -49,7 +49,7 @@ SessionDep = Annotated[AsyncSession, Depends(get_db)]
 
 async def get_user_db(
 	session: SessionDep,
-) -> AsyncGenerator[SQLAlchemyUserDatabase[User, uuid.UUID]]:
+) -> AsyncGenerator[SQLAlchemyUserDatabase[User, UUID]]:
 	from app.models.user import (
 		OAuthAccount,
 		User,
@@ -58,7 +58,7 @@ async def get_user_db(
 	yield SQLAlchemyUserDatabase(session, User, OAuthAccount)
 
 
-UserDatabaseDep = Annotated[SQLAlchemyUserDatabase[User, uuid.UUID], Depends(get_user_db)]
+UserDatabaseDep = Annotated[SQLAlchemyUserDatabase[User, UUID], Depends(get_user_db)]
 
 
 async def get_user_manager(
@@ -81,7 +81,7 @@ auth_backend = AuthenticationBackend(
 	get_strategy=get_jwt_strategy,
 )
 
-fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
+fastapi_users = FastAPIUsers[User, UUID](get_user_manager, [auth_backend])
 current_active_user = fastapi_users.current_user(active=True)
 current_superuser = fastapi_users.current_user(active=True, superuser=True)
 

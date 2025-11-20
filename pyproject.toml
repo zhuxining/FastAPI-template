@@ -6,9 +6,9 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.121.0",
-    "granian[dotenv,pname,uvloop,reload]>=2.5.6",
-    "pydantic>=2.12.3",
-    "pydantic-settings>=2.11.0",
+    "granian[dotenv,pname,uvloop,reload]>=2.6.0",
+    "pydantic>=2.12.4",
+    "pydantic-settings>=2.12.0",
     "sqlmodel>=0.0.27",
     "loguru>=0.7.3",
     "fastapi-users[oauth,sqlalchemy]>=15.0.1",
@@ -17,9 +17,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest-asyncio>=1.2.0",
-    "pytest>=8.4.2",
-    "ruff>=0.14.3",
+    "pytest-asyncio>=1.3.0",
+    "pytest>=9.0.1",
+    "ruff>=0.14.5",
     "alembic>=1.17.1",
     "aiosqlite>=0.21.0",
 ]

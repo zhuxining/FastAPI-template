@@ -1,5 +1,5 @@
-import uuid
 from datetime import datetime
+from uuid import UUID, uuid7
 
 from sqlmodel import Column, DateTime, Field, SQLModel, func
 
@@ -7,8 +7,8 @@ from sqlmodel import Column, DateTime, Field, SQLModel, func
 class BaseModel(SQLModel):
 	__abstract__ = True
 
-	id: uuid.UUID = Field(
-		default_factory=uuid.uuid7,
+	id: UUID = Field(
+		default_factory=uuid7,
 		primary_key=True,
 		sa_column_kwargs={"comment": "主键ID, UUID v7"},
 	)

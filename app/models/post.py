@@ -1,5 +1,5 @@
-import uuid
 from typing import Any, ClassVar
+from uuid import UUID, uuid7
 
 from sqlmodel import Field, SQLModel
 
@@ -17,9 +17,7 @@ class Post(BaseModel, PostBase, table=True):
 	__tablename__: ClassVar[Any] = "post"
 	__table_args__ = {"comment": "Posts table"}
 
-	author_id: uuid.UUID = Field(
-		default_factory=uuid.uuid7, sa_column_kwargs={"comment": "作者ID, UUID v7"}
-	)
+	author_id: UUID = Field(default_factory=uuid7, sa_column_kwargs={"comment": "作者ID, UUID v7"})
 
 
 # pydantic models

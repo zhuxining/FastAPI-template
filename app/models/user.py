@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from fastapi_users import schemas
 from fastapi_users.db import (
@@ -23,7 +23,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 # pydantic models
 
 
-class UserRead(schemas.BaseUser[uuid.UUID]):
+class UserRead(schemas.BaseUser[UUID]):
 	pass
 
 
