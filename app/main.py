@@ -11,7 +11,7 @@ from loguru import logger
 from app.api import api_router
 from app.core.config import settings
 from app.core.db import create_db_and_tables
-from app.core.deps import create_user
+from app.core.init_data import create_user
 from app.utils.exceptions import register_exception_handlers
 from app.utils.logging import RequestLoggingMiddleware, setup_logging
 

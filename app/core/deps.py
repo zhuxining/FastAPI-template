@@ -1,4 +1,3 @@
-import contextlib
 from collections.abc import AsyncGenerator
 from typing import Annotated
 from uuid import UUID
@@ -11,13 +10,11 @@ from fastapi_users.authentication import (
 	JWTStrategy,
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
-from fastapi_users.exceptions import UserAlreadyExists
-from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.db import async_session_maker
-from app.models import User, UserCreate
+from app.models import User
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, UUID]):
@@ -85,25 +82,5 @@ fastapi_users = FastAPIUsers[User, UUID](get_user_manager, [auth_backend])
 current_active_user = fastapi_users.current_user(active=True)
 current_superuser = fastapi_users.current_user(active=True, superuser=True)
 
-get_async_session_context = contextlib.asynccontextmanager(get_db)
-get_user_db_context = contextlib.asynccontextmanager(get_user_db)
-get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 
 CurrentUserDep = Annotated[User, Depends(current_active_user)]
-
-
-async def create_user(email: str, password: str, is_superuser: bool = False):
-	try:
-		async with (
-			get_async_session_context() as session,
-			get_user_db_context(session) as user_db,
-			get_user_manager_context(user_db) as user_manager,
-		):
-			user = await user_manager.create(
-				UserCreate(email=email, password=password, is_superuser=is_superuser)
-			)
-			logger.success(f"User created {user}")
-			return user
-	except UserAlreadyExists:
-		logger.warning(f"User {email} already exists")
-		pass

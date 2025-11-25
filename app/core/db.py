@@ -5,7 +5,9 @@ from app.core.config import settings
 from app.models.user import Base
 
 database_url = (
-	settings.postgre_url if settings.DATABASE_TYPE == "postgresql" else settings.SQLITE_URL
+	settings.postgre_url
+	if settings.DATABASE_TYPE == "postgresql"
+	else f"sqlite+aiosqlite:///{settings.SQLITE_URL}"
 )
 
 engine = create_async_engine(str(database_url), echo=False, future=True)
