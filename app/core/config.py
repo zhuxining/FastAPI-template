@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
 	# Database Settings
 	DATABASE_TYPE: Literal["postgresql", "sqlite"] = "sqlite"
-	SQLITE_URL: str = "tmp/local.db"
+	SQLITE_URL: str = "local.db"
 	POSTGRES_SERVER: str = ""
 	POSTGRES_PORT: int = 5432
 	POSTGRES_DB: str = ""

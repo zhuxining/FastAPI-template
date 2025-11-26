@@ -33,7 +33,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, UUID]):
 		print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 
-async def get_db() -> AsyncGenerator[AsyncSession]:
+async def get_db_session() -> AsyncGenerator[AsyncSession]:
 	async with async_session_maker() as session:
 		try:
 			yield session
@@ -41,33 +41,28 @@ async def get_db() -> AsyncGenerator[AsyncSession]:
 			await session.close()
 
 
-SessionDep = Annotated[AsyncSession, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_db_session)]
 
 
-async def get_user_db(
+async def get_user_db_session(
 	session: SessionDep,
 ) -> AsyncGenerator[SQLAlchemyUserDatabase[User, UUID]]:
-	from app.models.user import (
-		OAuthAccount,
-		User,
-	)  # Import here to avoid circular dependency
+	from app.models.user import OAuthAccount, User  # Import here to avoid circular dependency
 
 	yield SQLAlchemyUserDatabase(session, User, OAuthAccount)
 
 
-UserDatabaseDep = Annotated[SQLAlchemyUserDatabase[User, UUID], Depends(get_user_db)]
+UserDatabaseDep = Annotated[SQLAlchemyUserDatabase[User, UUID], Depends(get_user_db_session)]
 
 
-async def get_user_manager(
-	user_db: UserDatabaseDep,
-) -> AsyncGenerator[UserManager]:
+async def get_user_manager(user_db: UserDatabaseDep) -> AsyncGenerator[UserManager]:
 	yield UserManager(user_db)
 
 
 def get_jwt_strategy() -> JWTStrategy:
 	return JWTStrategy(
 		secret=settings.SECRET_KEY,
-		lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
+		lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
 	)
 
 

@@ -4,20 +4,19 @@ from fastapi import APIRouter, Depends
 from pydantic import UUID7, BaseModel, ConfigDict, Field
 from sqlmodel import select
 
-from app import models
 from app.core.deps import CurrentUserDep, SessionDep
-from app.models import Post
+from app.models import Post, PostCreate, PostRead, PostUpdate
 from app.utils.exceptions import ForbiddenException, NotFoundException
 from app.utils.responses import ResponseEnvelope, success_response
 
 router = APIRouter(prefix="/post", tags=["post"])
 
 
-@router.post("/", response_model=ResponseEnvelope[models.PostRead])
+@router.post("/", response_model=ResponseEnvelope[PostRead])
 async def create_post(
 	*,
 	db: SessionDep,
-	post_in: models.PostCreate,
+	post_in: PostCreate,
 	current_user: CurrentUserDep,
 ):
 	post = Post(
@@ -29,7 +28,7 @@ async def create_post(
 	db.add(post)
 	await db.commit()
 	await db.refresh(post)
-	post_read = models.PostRead.model_validate(post)
+	post_read = PostRead.model_validate(post)
 	return success_response(data=post_read, message="创建成功")
 
 
@@ -41,18 +40,18 @@ class FilterParams(BaseModel):
 	order_by: Literal["created_at"] = "created_at"
 
 
-@router.get("/", response_model=ResponseEnvelope[list[models.PostRead]])
+@router.get("/", response_model=ResponseEnvelope[list[PostRead]])
 async def read_posts(
 	db: SessionDep,
 	filter_query: Annotated[FilterParams, Depends(FilterParams)],
 ):
 	result = await db.execute(select(Post).offset(filter_query.offset).limit(filter_query.limit))
 	posts = result.scalars().all()
-	post_reads = [models.PostRead.model_validate(post) for post in posts]
+	post_reads = [PostRead.model_validate(post) for post in posts]
 	return success_response(data=post_reads, message="查询成功")
 
 
-@router.get("/{post_id}", response_model=ResponseEnvelope[models.PostRead])
+@router.get("/{post_id}", response_model=ResponseEnvelope[PostRead])
 async def read_post(
 	*,
 	db: SessionDep,
@@ -63,16 +62,16 @@ async def read_post(
 	post = result.scalar_one_or_none()
 	if not post:
 		raise NotFoundException(message="Post not found", error_code="POST_NOT_FOUND")
-	post_read = models.PostRead.model_validate(post)
+	post_read = PostRead.model_validate(post)
 	return success_response(data=post_read, message="查询成功")
 
 
-@router.put("/{post_id}", response_model=ResponseEnvelope[models.PostRead])
+@router.put("/{post_id}", response_model=ResponseEnvelope[PostRead])
 async def update_post(
 	*,
 	db: SessionDep,
 	post_id: UUID7,
-	post_in: models.PostUpdate,
+	post_in: PostUpdate,
 	current_user: CurrentUserDep,
 ):
 	result = await db.execute(select(Post).where(Post.id == post_id))
@@ -89,7 +88,7 @@ async def update_post(
 	db.add(post)
 	await db.commit()
 	await db.refresh(post)
-	post_read = models.PostRead.model_validate(post)
+	post_read = PostRead.model_validate(post)
 	return success_response(data=post_read, message="更新成功")
 
 
@@ -109,3 +108,11 @@ async def delete_post(
 	await db.delete(post)
 	await db.commit()
 	return success_response(data={"deleted": True}, message="删除成功")
+
+
+async def get_post_by_id(post_id: UUID7, db: SessionDep) -> Post:
+	result = await db.execute(select(Post).where(Post.id == post_id))
+	post = result.scalar_one_or_none()
+	if not post:
+		raise NotFoundException(message="Post not found", error_code="POST_NOT_FOUND")
+	return post

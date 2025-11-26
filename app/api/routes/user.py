@@ -10,9 +10,7 @@ from app.utils.responses import ResponseEnvelope, success_response
 router = APIRouter(prefix="/user", tags=["user"])
 
 # User management routes
-router.include_router(
-	fastapi_users.get_users_router(UserRead, UserUpdate),
-)
+router.include_router(fastapi_users.get_users_router(UserRead, UserUpdate))
 
 
 @router.get("/me", response_model=ResponseEnvelope[dict])
