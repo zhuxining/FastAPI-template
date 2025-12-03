@@ -7,7 +7,7 @@ from .user_deps import CreatedUser, UserFactory
 __all__ = [
 	"CreatedUser",
 	"UserFactory",
+	"get_auth_headers",
 	"random_email",
 	"random_lower_string",
-	"get_auth_headers",
 ]
