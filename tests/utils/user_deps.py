@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import TypeVar
@@ -10,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.deps import UserManager
 from app.models.user import OAuthAccount, User, UserCreate
-from tests.utils.data import random_email, random_lower_string
+
+from .data import random_email, random_lower_string
 
 T = TypeVar("T")
 
@@ -70,7 +69,9 @@ class UserFactory:
             await target_session.refresh(user)
             return CreatedUser(instance=user, password=password)
 
-        return await self._with_session(_create, session=session)
+        result = await self._with_session(_create, session=session)
+        assert result is not None
+        return result
 
     async def create_active(
         self,

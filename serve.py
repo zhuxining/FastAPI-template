@@ -4,12 +4,12 @@ if __name__ == "__main__":
     app = Granian(
         "app.main:app",
         port=8000,
-        interface="asgi",  # type: ignore
+        interface="asgi",
         workers=1,
-        loop="uvloop",  # type: ignore
+        loop="uvloop",
         respawn_failed_workers=True,
         process_name="fastapi_granian_app",
         log_enabled=True,
-        log_level="info",  # type: ignore
+        log_level="info",
     )
     app.serve()

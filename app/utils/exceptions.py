@@ -61,7 +61,7 @@ class ConflictException(AppException):
     message = "资源冲突"
 
 
-async def _build_json_response(  # noqa: RUF029
+async def _build_json_response(
     request: Request,
     *,
     status_code: int,

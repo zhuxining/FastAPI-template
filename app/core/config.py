@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = ""
     POSTGRES_USER: str = ""
     POSTGRES_PASSWORD: str = ""
+    POSTGRES_SCHEMA: str = "fastapi_app"  # PostgreSQL schema name
 
     # Security Settings
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []  # CORS

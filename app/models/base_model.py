@@ -3,9 +3,14 @@ from uuid import UUID, uuid7
 
 from sqlmodel import Column, DateTime, Field, SQLModel, func
 
+from app.core.config import settings
+
 
 class BaseModel(SQLModel):
     __abstract__ = True
+
+    if settings.DATABASE_TYPE == "postgresql":
+        __table_args__ = {"schema": settings.POSTGRES_SCHEMA}
 
     id: UUID = Field(
         default_factory=uuid7,

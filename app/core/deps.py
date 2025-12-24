@@ -40,7 +40,7 @@ async def get_db_session() -> AsyncGenerator[AsyncSession]:
 SessionDep = Annotated[AsyncSession, Depends(get_db_session)]
 
 
-async def get_user_db_session(  # noqa: RUF029
+async def get_user_db_session(
     session: SessionDep,
 ) -> AsyncGenerator[SQLAlchemyUserDatabase[User, UUID]]:
     from app.models.user import OAuthAccount, User  # Import here to avoid circular dependency
@@ -51,7 +51,7 @@ async def get_user_db_session(  # noqa: RUF029
 UserDatabaseDep = Annotated[SQLAlchemyUserDatabase[User, UUID], Depends(get_user_db_session)]
 
 
-async def get_user_manager(user_db: UserDatabaseDep) -> AsyncGenerator[UserManager]:  # noqa: RUF029
+async def get_user_manager(user_db: UserDatabaseDep) -> AsyncGenerator[UserManager]:
     yield UserManager(user_db)
 
 

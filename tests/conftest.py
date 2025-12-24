@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from fastapi.testclient import TestClient
 import pytest
 import pytest_asyncio
@@ -9,7 +7,8 @@ from sqlmodel import SQLModel
 from app.core import deps
 from app.main import app
 from app.models.user import Base as UserBase
-from tests.utils.user_deps import CreatedUser, UserFactory
+
+from .utils.user_deps import CreatedUser, UserFactory
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -55,11 +54,11 @@ def client(session_maker, test_user: CreatedUser):
     async def _override_current_user():
         return test_user.instance
 
-    app.dependency_overrides[deps.get_db] = _override_get_db
+    app.dependency_overrides[deps.get_db_session] = _override_get_db
     app.dependency_overrides[deps.current_active_user] = _override_current_user
 
     with TestClient(app) as test_client:
         yield test_client
 
-    app.dependency_overrides.pop(deps.get_db, None)
+    app.dependency_overrides.pop(deps.get_db_session, None)
     app.dependency_overrides.pop(deps.current_active_user, None)

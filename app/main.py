@@ -33,6 +33,7 @@ def custom_generate_unique_id(route: APIRoute):
     return f"{route.tags[0]}-{route.name}"
 
 
+# ———————————— 初始化 FastAPI 实例 ———————————— #
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description=settings.DESCRIPTION,
@@ -44,24 +45,30 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
     debug=(settings.ENVIRONMENT == "dev"),
 )
+
+# ———————————— 注册路由、中间件与异常处理 ———————————— #
+# 1. 异常处理
 register_exception_handlers(app)
 
-# CORS middleware
+# 2. 中间件 (注意顺序: 从内到外添加, 越晚添加的越先执行)
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)  # ty:ignore[invalid-argument-type]
+app.add_middleware(RequestLoggingMiddleware)  # ty:ignore[invalid-argument-type]
+
+if settings.ENVIRONMENT == "prod":
+    app.add_middleware(HTTPSRedirectMiddleware)  # ty:ignore[invalid-argument-type]
+    app.add_middleware(
+        TrustedHostMiddleware,  # ty:ignore[invalid-argument-type]
+        allowed_hosts=settings.TRUSTED_HOSTS,
+    )
+
 if settings.all_cors_origins:
     app.add_middleware(
-        CORSMiddleware,
+        CORSMiddleware,  # ty:ignore[invalid-argument-type]
         allow_origins=settings.all_cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-if settings.ENVIRONMENT == "prod":
-    app.add_middleware(HTTPSRedirectMiddleware)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
-
-app.add_middleware(RequestLoggingMiddleware)
-app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
-
-# Include API router
+# 3. 路由
 app.include_router(api_router, prefix=settings.API_V1_STR)
