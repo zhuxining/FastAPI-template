@@ -20,7 +20,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", ".env.prod"),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="allow",  # Allow extra fields from env file
@@ -41,10 +41,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_SCHEMA: str = "fastapi_app"  # PostgreSQL schema name
 
-    # Security Settings
-    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []  # CORS
-    TRUSTED_HOSTS: Annotated[list | str, BeforeValidator(parse_cors)] = []  # Allowed Hosts
-
     SECRET_KEY: str = "YOUR-SECRET-KEY-123"  # JWT Settings, Change in production
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
 
@@ -56,11 +52,6 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = pyproject.get("project", {}).get("name")
     VERSION: str = pyproject.get("project", {}).get("version")
     DESCRIPTION: str = pyproject.get("project", {}).get("description")
-
-    @computed_field
-    @property
-    def all_cors_origins(self) -> list[str]:
-        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
 
     @computed_field
     @property

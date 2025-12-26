@@ -25,8 +25,10 @@ class PostCreate(PostBase):
     pass
 
 
-class PostUpdate(PostBase):
-    pass
+class PostUpdate(SQLModel):
+    title: str | None = None
+    content: str | None = None
+    is_published: bool | None = None
 
 
 class PostRead(BaseModel, PostBase):

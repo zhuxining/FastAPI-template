@@ -51,24 +51,7 @@ app = FastAPI(
 register_exception_handlers(app)
 
 # 2. 中间件 (注意顺序: 从内到外添加, 越晚添加的越先执行)
-app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)  # ty:ignore[invalid-argument-type]
 app.add_middleware(RequestLoggingMiddleware)  # ty:ignore[invalid-argument-type]
-
-if settings.ENVIRONMENT == "prod":
-    app.add_middleware(HTTPSRedirectMiddleware)  # ty:ignore[invalid-argument-type]
-    app.add_middleware(
-        TrustedHostMiddleware,  # ty:ignore[invalid-argument-type]
-        allowed_hosts=settings.TRUSTED_HOSTS,
-    )
-
-if settings.all_cors_origins:
-    app.add_middleware(
-        CORSMiddleware,  # ty:ignore[invalid-argument-type]
-        allow_origins=settings.all_cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
 # 3. 路由
 app.include_router(api_router, prefix=settings.API_V1_STR)

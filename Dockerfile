@@ -12,7 +12,7 @@ PYTHONUNBUFFERED=1 \
 PYTHONHASHSEED=random \
 UV_NO_CACHE=1 \
 UV_COMPILE_BYTECODE=1 \
-UV_SYSTEM_PYTHON=1 
+UV_SYSTEM_PYTHON=1
 
 WORKDIR /app
 COPY . /app
@@ -24,4 +24,7 @@ RUN uv sync --frozen --no-dev --no-cache
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-CMD ["uv", "run", "serve.py"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+  CMD python -c "import socket; s=socket.socket(); s.settimeout(2); s.connect(('0.0.0.0', 8000)); s.close()"
+
+CMD ["uv", "run", "--no-dev", "serve.py"]
